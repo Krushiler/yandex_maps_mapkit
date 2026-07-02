@@ -15,9 +15,10 @@ class AnnotatedClass {
 
 class WeakInterfacesMetaBuilder extends Builder {
   Iterable<AnnotatedClass> _annotatedClass(LibraryReader library) {
-    final checker = TypeChecker.fromRuntime(WeakInterface);
-    return library.annotatedWith(checker).map((e) => AnnotatedClass(
-        e.annotation.read('name').stringValue, e.element.displayName));
+    final checker = TypeChecker.typeNamed(WeakInterface);
+    return library
+        .annotatedWith(checker)
+        .map((e) => AnnotatedClass(e.annotation.read('name').stringValue, e.element.displayName));
   }
 
   @override
@@ -31,14 +32,12 @@ class WeakInterfacesMetaBuilder extends Builder {
       if (!await buildStep.resolver.isLibrary(file)) {
         continue;
       }
-      for (final annotatedClass in _annotatedClass(
-          LibraryReader(await buildStep.resolver.libraryFor(file)))) {
+      for (final annotatedClass in _annotatedClass(LibraryReader(await buildStep.resolver.libraryFor(file)))) {
         final pathSegments = file.pathSegments;
         final namespace = pathSegments[2];
         final path = file.uri.path;
         imports.add("import 'package:$path' as $namespace;");
-        methods.add(
-            "  '${annotatedClass.name}': $namespace.${annotatedClass.func}.fromNativePtrImpl,");
+        methods.add("  '${annotatedClass.name}': $namespace.${annotatedClass.func}.fromNativePtrImpl,");
       }
     }
 
@@ -57,9 +56,7 @@ class WeakInterfacesMetaBuilder extends Builder {
     result.writeln('};');
 
     buildStep.writeAsString(
-        AssetId(buildStep.inputId.package,
-            'lib/src/bindings/weak_interfaces_meta.g.dart'),
-        result.toString());
+        AssetId(buildStep.inputId.package, 'lib/src/bindings/weak_interfaces_meta.g.dart'), result.toString());
   }
 
   @override
