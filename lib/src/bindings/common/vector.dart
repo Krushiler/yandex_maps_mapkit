@@ -36,8 +36,12 @@ class Vector<T> extends ListBase<T> implements Finalizable {
     _finalizer.attach(this, _ptr, detach: this);
   }
 
+  // Order of length and setter is important because of new dart version
   @override
-  set length(int _) => throw UnsupportedError("Vector read-only");
+  final length;
+
+  @override
+  set length(int newLength) => throw UnsupportedError("Vector read-only");
 
   @override
   T operator [](int index) {
@@ -57,9 +61,6 @@ class Vector<T> extends ListBase<T> implements Finalizable {
   static final _finalizer = NativeFinalizer(_vector_free_native);
   final Pointer<Void> _ptr;
   final T Function(Pointer<Void>) _f;
-
-  @override
-  final length;
 }
 
 @internal
